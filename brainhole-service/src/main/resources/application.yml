@@ -6,4 +6,6 @@ server:
 eureka:
   instance:    
     metadataMap:
-      apiui: https://${server.host}:${server.port}${server.contextPath}/apiui         
+      apiui: https://${server.host}:${server.port}${server.contextPath}/apiui   
+            
+logging.level.org.reflections.Reflections: ERROR
