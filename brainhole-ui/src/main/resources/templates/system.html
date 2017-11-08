@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="base/mainlayout">
+<head>
+	<!-- css -->
+	
+</head>
+<body>
+	<div layout:fragment="content">
+	<div class="col-sm-12 col-md-12">    	
+        <!-- 样例 -->         
+        <div class="row panel panel-default">
+            <div class="panel-heading">日志</div>
+            <div id="logs" class="panel-body"></div>
+        </div>
+                
+        <!-- 样例 -->         
+        <div class="row panel panel-default">
+            <div class="panel-heading">配置二</div>
+            <div class="panel-body">
+                <p>描述此配置的作用</p>
+            </div>
+			<ul class="list-group">
+			    <li class="list-group-item">参数1</li>
+			    <li class="list-group-item">参数2</li>
+			    <li class="list-group-item">...</li>
+			</ul>            
+        </div>
+        
+        <div class="row panel panel-danger">
+            <div class="panel-heading">配置三（警告）</div>
+            <div class="panel-body">
+                <p>此配置修改有风险</p>
+            </div>           
+        </div>        
+        
+		<!-- js -->
+		<script th:inline="javascript">
+			$(document).ready(function() {	
+				var logsurl = /*[[@{/logsindex?access_token=}+${access_token}+' #logstable']]*/
+	            $("#logs").load(logsurl);
+			})
+		</script>		
+	</div>
+	</div>
+</body>
+</html>

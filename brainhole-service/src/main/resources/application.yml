@@ -1,0 +1,9 @@
+discovery.server.address: https://localhost:8761/eureka/ 
+server:
+  port: 60000
+  host: localhost
+  contextPath: /brainholeservice
+eureka:
+  instance:    
+    metadataMap:
+      apiui: https://${server.host}:${server.port}${server.contextPath}/apiui         

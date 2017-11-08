@@ -1,0 +1,8 @@
+info:
+  app:
+    name: 脑洞UI
+    description: 脑洞UI
+    version: 0.0.1
+spring:
+  application:
+    name: brainhole-ui

@@ -1,0 +1,6 @@
+discovery.server.address: https://localhost:8761/eureka/ 
+server:
+  port: 60000
+  host: localhost
+  contextPath: /brainholeui                                       
+spring.thymeleaf.cache: false  

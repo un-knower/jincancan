@@ -1,0 +1,10 @@
+/target/
+.project
+.classpath
+/.settings/
+/logs/
+public.key
+bomc.jks
+license.dat
+.DS_Store
+.springBeans

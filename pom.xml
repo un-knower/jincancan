@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.iplatform</groupId>
+	<artifactId>brainhole-parent</artifactId>
+	<version>${brainhole.version}</version>
+	<packaging>pom</packaging>
+	
+	<properties>
+		<brainhole.version>0.0.1</brainhole.version>
+	</properties>
+	
+	<parent>
+		<groupId>org.iplatform</groupId>
+		<artifactId>iplatform-parent</artifactId>
+		<version>0.0.6-SNAPSHOT</version>
+		<relativePath></relativePath>
+	</parent>
+
+	<modules>
+		<module>brainhole-util</module>
+		<module>brainhole-service</module>
+		<module>brainhole-hole</module>
+	</modules>
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>Team Nexus Repository</name>
+			<url>http://111.204.35.227:8081/nexus/content/groups/public</url>
+		</repository>
+		<repository>
+			<id>spring-snapshots</id>
+			<name>Spring Snapshots</name>
+			<url>https://repo.spring.io/snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+</project>

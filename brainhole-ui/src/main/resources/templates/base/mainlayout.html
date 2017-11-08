@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+	<title>应用名称</title>
+	<!-- css -->
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<link rel="stylesheet" th:href="@{/css/bootstrap.override.css}" />
+	<link rel="stylesheet" th:href="@{/css/main.css}" />
+	<link rel="stylesheet" th:href="@{/css/bootstrap-itosi.css}" />
+</head>
+
+<style type="text/css">
+	body {
+		font-family: 微软雅黑, 'Hiragino Sans GB', arial;
+		font-size: 12px;
+		min-width: 1160px;
+	}
+	.panel {
+        margin-bottom: 5px;	
+	}
+</style>
+
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+	    <!-- 公共消息区域 -->
+		<div id="messagetip" class="col-md-6 col-md-offset-3" style="position: absolute; margin-top: 5px;">
+		</div><!-- 公共消息区域 -->
+	       
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div>
+          	<a class="navbar-brand" href="#" th:style="'width:50px; background-position:center; background-repeat: no-repeat; background-image:url('+@{/images/logo.png}+')'"></a>
+          	<a class="navbar-brand" href="#">应用名称</a>
+          </div>          
+        </div>      
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">          
+            <li>
+	        	<form class="navbar-form" th:action="${oauthServerAddress}+'/logout'" method="post">
+	        		<input type="hidden" name="access_token" th:value="${access_token}"></input>
+	        		<button class="btn btn-primary" type="submit" style="background-color: transparent; border-color: #222;">注销</button>
+	        	</form>   
+            </li>
+          </ul>
+        </div>       
+      </div>
+    </nav>
+    
+    <div class="container-fluid">
+    	<div class="row">
+        	<div class="col-md-2 sidebar">
+          		<ul class="nav nav-sidebar">
+		            <li class="active">
+		                <form name="form_index" th:action="@{/}" method="post">
+		                    <input type="hidden" name="access_token"
+		                        th:value="${access_token}"></input>
+		                </form>            
+		                <a href="javascript:document.form_index.submit();">首页 <span class="sr-only">(current)</span></a>            
+		            </li>         		          		
+		            <li th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+		                <form name="form_systemmanager" th:action="@{/systemmanager}" method="post">
+		                    <input type="hidden" name="access_token"
+		                        th:value="${access_token}"></input>
+		                </form>             
+		                <a href="javascript:document.form_systemmanager.submit();" th:style="(${sidebar}=='systemmanager')?'background-color: #eee':''">系统配置</a>            
+		            </li>               		         		           		            		           		    		          		          
+          		</ul>          		
+        	</div> 
+        	<!-- js -->
+		    <script th:src="@{/js/jquery-1.11.0.js}"></script>
+		    <script th:src="@{/js/bootstrap.min.js}"></script>
+		    <script th:src="@{/js/json2.js}"></script>     
+		    <div>     	
+        	<div layout:fragment="content" class="col-md-10 col-md-offset-2 main">
+				主内容
+        	</div>        	      
+      	</div>
+        <div class="container-fluid">
+            <div class="col-sm-4 col-sm-offset-4" style="text-align: center">
+             <form name="form_lic" th:action="@{/lic}" method="post">
+                 <input type="hidden" name="access_token"
+                     th:value="${access_token}"></input>
+             </form>             
+             <a href="javascript:document.form_lic.submit();"><span th:text="${T(java.lang.System).getProperty('licenseinfo')}" /></a>
+            </div>  
+        </div>        	      	
+    </div>  
+</body>
+</html>

@@ -1,0 +1,9 @@
+info:
+  app:
+    name: 脑洞-洞
+    description: 脑洞-洞
+    version: 0.0.1
+spring:
+  application:
+    name: brainhole-hole
+     

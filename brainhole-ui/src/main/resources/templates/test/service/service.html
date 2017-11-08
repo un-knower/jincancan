@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="base/mainlayout">
+<body>
+	<div layout:fragment="content"
+		class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+		<div class="row" style="margin-right: -15px;margin-left: -20px;">
+			<button id="btn_test" type="button" class="btn btn-primary button-save">测试调用服务</button>				
+		</div>
+		
+	  	<script th:src="@{/js/jquery-1.11.0.js}"></script>
+		<script th:src="@{/js/bootstrap.min.js}"></script>	
+		<script th:src="@{/js/common.js}"></script>
+		<script th:src="@{/js/json2.js}"></script>
+		<script type="text/javascript" th:inline="javascript">
+		    $(document).ajaxSend(function(e,xhr,opt){
+		    	xhr.setRequestHeader("x-ipf-pageid", "empty-ui-testservice");
+		    })			
+			$(document).ready(function() {				
+				$('div.sidebar ul li').removeClass('active');
+				$('#service_page').addClass('active');				
+				$("#btn_test").click(function(){
+					$.ajax({
+						url:/*[[@{/test/testservice}]]*/,
+						contentType:"application/json;charset=UTF-8",
+						async: false,
+ 						data:{
+							param:"2017-10-10 00:00"
+						}, 
+						headers : {
+							"Authorization" : "Bearer "+ /*[[${access_token}]]*/ 
+						},
+						success: function(data, status, xhr) {
+							alert(JSON.stringify(data))
+						},
+						error: function(event, jqxhr, settings) {
+       						showErrorTip("错误",3000);
+       					}
+					});
+			  	});
+			}(jQuery));	
+		</script>		
+	</div>
+</body>
+</html>
