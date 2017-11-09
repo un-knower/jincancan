@@ -11,5 +11,31 @@
 		<version>${brainhole.version}</version>
 		<relativePath>../</relativePath>
 	</parent>
-
+    <dependencies>
+                <!-- deeplearning4j -->
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-native</artifactId>
+            <version>${nd4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>${dl4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-nlp</artifactId>
+            <version>${dl4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <artifactId>datavec-data-codec</artifactId>
+            <groupId>org.datavec</groupId>
+            <version>${datavec.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>
