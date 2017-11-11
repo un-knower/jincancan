@@ -11,7 +11,7 @@ public class BrainServiceSecurityConfiguration extends WebSecurityConfigurerAdap
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 	    //自定义跳过认证拦截的路径
-	    web.ignoring().antMatchers("/api/v1/test/**");
+	    web.ignoring().antMatchers("/**");
 	}
 
 }

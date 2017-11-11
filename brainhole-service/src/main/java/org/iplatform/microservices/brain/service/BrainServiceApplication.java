@@ -1,5 +1,9 @@
 package org.iplatform.microservices.brain.service;
 
+import org.deeplearning4j.api.storage.StatsStorage;
+import org.deeplearning4j.ui.api.UIServer;
+import org.deeplearning4j.ui.stats.StatsListener;
+import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.iplatform.microservices.service.IPlatformServiceApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +33,6 @@ public class BrainServiceApplication extends IPlatformServiceApplication {
     private static final Logger LOG = LoggerFactory.getLogger(BrainServiceApplication.class);
     
     public static void main(String[] args) throws Exception {
-        run(BrainServiceApplication.class, args);
+        run(BrainServiceApplication.class, args);      
     }
 }

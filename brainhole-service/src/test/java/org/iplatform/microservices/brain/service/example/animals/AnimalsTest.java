@@ -20,7 +20,7 @@ import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.iplatform.microservices.brain.service.multiLayernetwork.NetworkService;
+import org.iplatform.microservices.brain.service.multiLayernetwork.FeedforwardNeuralNetworks;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nd4j.linalg.activations.Activation;
@@ -58,24 +58,24 @@ public class AnimalsTest {
         int numEpochs = 10;//循环次数，循环次数>cvs文件总行数/递归批次数
         double hopeScore = 0.97d;//期望评分数，当训练后的分数大于等于期望评分数后停止训练
         
-        NetworkService networkService = new NetworkService.NetworkServiceBuilder(numInputs, outputNum).seed(6).iterations(1000).build();
+        FeedforwardNeuralNetworks feedforwardNeuralNetworks = new FeedforwardNeuralNetworks.NetworkServiceBuilder(numInputs, outputNum).seed(6).iterations(1000).build();
         //训练模型
-        boolean trainingSucceed = networkService.trainingCSV(new File("data/animals/animals_code.csv"), skipNumLines,
+        boolean trainingSucceed = feedforwardNeuralNetworks.trainingCSV(new File("data/animals/animals_code.csv"), skipNumLines,
                 delimiter, percentTrain, batchSize, labelIndex, outputNum, numEpochs, hopeScore);
 
         //保存模型
         if (trainingSucceed) {
-            networkService.saveModel("model.brain", Boolean.TRUE);
+            feedforwardNeuralNetworks.saveModel("model.brain", Boolean.TRUE);
 
             //使用模型进行分类预测
             int predictFileRowCount = 3;//预测数据3行
 
             //情况2，验证数据不包含实际值
-            networkService.predict(new File("data/animals/animals_prediction.csv"), skipNumLines, delimiter,
+            feedforwardNeuralNetworks.predict(new File("data/animals/animals_prediction.csv"), skipNumLines, delimiter,
                     predictFileRowCount);
 
             //情况1，验证数据包含实际值，可用于比较实际值和预测值
-            networkService.predict(new File("data/animals/animals_prediction_compare.csv"), skipNumLines, delimiter,
+            feedforwardNeuralNetworks.predict(new File("data/animals/animals_prediction_compare.csv"), skipNumLines, delimiter,
                     predictFileRowCount, labelIndex, outputNum);
         } else {
             log.info("模型训练结束，未达到期望评价分:" + hopeScore);

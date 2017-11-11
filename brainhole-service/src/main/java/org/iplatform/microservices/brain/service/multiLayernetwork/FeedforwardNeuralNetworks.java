@@ -1,3 +1,7 @@
+/*
+ * 前馈神经网络
+ * 可用于分类预测
+ * */
 package org.iplatform.microservices.brain.service.multiLayernetwork;
 
 import java.io.File;
@@ -7,6 +11,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.PostConstruct;
 
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
@@ -21,6 +27,7 @@ import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.api.IterationListener;
+import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.iplatform.microservices.brain.service.multiLayernetwork.listeners.ScoreIterationListener;
 import org.iplatform.microservices.brain.util.INDArrayUtil;
@@ -34,24 +41,28 @@ import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
  * @author zhanglei
- *
+ * 
  */
-@Service
-public class NetworkService {
+public class FeedforwardNeuralNetworks {
 
-    private static Logger log = LoggerFactory.getLogger(NetworkService.class);
+    private static Logger log = LoggerFactory.getLogger(FeedforwardNeuralNetworks.class);
     private MultiLayerNetwork model;
     private DataSet trainData;
     private DataSet testData;
     private Normalizer normalizer;
 
-    public NetworkService(MultiLayerNetwork model, Normalizer normalizer, IterationListener iterationListener) {
+    public FeedforwardNeuralNetworks(MultiLayerNetwork model, Normalizer normalizer,
+            IterationListener iterationListener, StatsListener statsListener) {
         this.model = model;
         this.model.setListeners(iterationListener);
+        if (statsListener != null) {
+            this.model.setListeners(statsListener);
+        }
         this.normalizer = normalizer;
     }
 
@@ -62,8 +73,8 @@ public class NetworkService {
      * @param outputNum 输出分类数
      * @return
      */
-    public NetworkService(Normalizer normalizer, IterationListener iterationListener, long seed, int iterations,
-            final int numInputs, int outputNum) {
+    public FeedforwardNeuralNetworks(Normalizer normalizer, IterationListener iterationListener,
+            StatsListener statsListener, long seed, int iterations, final int numInputs, int outputNum) {
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(seed).iterations(iterations)
                 .activation(Activation.TANH).weightInit(WeightInit.XAVIER).learningRate(0.1).regularization(true)
                 .l2(1e-4).list().layer(0, new DenseLayer.Builder().nIn(numInputs).nOut(outputNum).build())
@@ -75,16 +86,21 @@ public class NetworkService {
         this.model = new MultiLayerNetwork(conf);
         this.model.init();
         this.model.setListeners(iterationListener);
+        if (statsListener != null) {
+            this.model.setListeners(statsListener);
+        }        
         this.normalizer = normalizer;
-    }
-    
-    public boolean trainingCSV(File file, int skipNumLines, String delimiter, double percentTrain, int batchSize,
-            int labelIndex, int numClasses, int numEpochs, double hopeScore) throws IOException, InterruptedException {
-        return this.trainingCSV(file, skipNumLines, delimiter, percentTrain, batchSize, labelIndex, numClasses, numEpochs, hopeScore, -1);
     }
 
     public boolean trainingCSV(File file, int skipNumLines, String delimiter, double percentTrain, int batchSize,
-            int labelIndex, int numClasses, int numEpochs, double hopeScore, long timeoutMinute) throws IOException, InterruptedException {
+            int labelIndex, int numClasses, int numEpochs, double hopeScore) throws IOException, InterruptedException {
+        return this.trainingCSV(file, skipNumLines, delimiter, percentTrain, batchSize, labelIndex, numClasses,
+                numEpochs, hopeScore, -1);
+    }
+
+    public boolean trainingCSV(File file, int skipNumLines, String delimiter, double percentTrain, int batchSize,
+            int labelIndex, int numClasses, int numEpochs, double hopeScore, long timeoutMinute)
+            throws IOException, InterruptedException {
         if (file.exists()) {
             RecordReader recordReader = new CSVRecordReader(skipNumLines, delimiter);
             recordReader.initialize(new FileSplit(file));
@@ -101,8 +117,8 @@ public class NetworkService {
         }
     }
 
-    private boolean training(DataSet trainingData, DataSet testData, int numClasses, int numEpochs,
-            double hopeScore, long timeoutMinute) {
+    private boolean training(DataSet trainingData, DataSet testData, int numClasses, int numEpochs, double hopeScore,
+            long timeoutMinute) {
         //获取 STDEV 基于样本估算标准偏差
         normalizer.fit(trainingData);
         //标准化训练数据，应该是要转为0-1之间的数据
@@ -111,15 +127,15 @@ public class NetworkService {
         normalizer.transform(testData);
 
         //超时时间
-        long stopTime = System.currentTimeMillis()+(timeoutMinute*60*1000);
+        long stopTime = System.currentTimeMillis() + (timeoutMinute * 60 * 1000);
         long numEpochsCounter = 0;
         log.info("开始训练模型");
         INDArray output = null;
         long s = System.currentTimeMillis();
         boolean succeed = Boolean.FALSE;
         Evaluation eval = new Evaluation(numClasses);
-        while(System.currentTimeMillis()<stopTime || numEpochsCounter<numEpochs){
-            model.fit(trainingData);            
+        while (System.currentTimeMillis() < stopTime || numEpochsCounter < numEpochs) {
+            model.fit(trainingData);
             output = model.output(testData.getFeatureMatrix());
             new Evaluation(numClasses);
             eval.eval(testData.getLabels(), output);
@@ -128,14 +144,14 @@ public class NetworkService {
                 break;
             } else {
                 log.info("评价分:" + eval.f1() + ",期望分:" + hopeScore);
-            }         
+            }
             numEpochsCounter++;
         }
         long e = System.currentTimeMillis();
         log.info("+-----------------------------------------------------+");
-        if(succeed){
+        if (succeed) {
             log.info("| 训练成功(期望评价分:" + hopeScore + ")");
-        }else{
+        } else {
             log.info("| 训练失败(期望评价分:" + hopeScore + ")");
         }
         log.info("+-----------------------------------------------------+");
@@ -149,8 +165,8 @@ public class NetworkService {
         log.info("| 召回率:" + eval.recall());//真正例的数量除以真正例与假负例数之和
         log.info("| 评价分:" + eval.f1());//精确率和召回率的加权平均值
         log.info("+-----------------------------------------------------+");
-        log.info("+ 耗时:"+(e-s)/1000+"秒");
-        log.info("+-----------------------------------------------------+");           
+        log.info("+ 耗时:" + (e - s) / 1000 + "秒");
+        log.info("+-----------------------------------------------------+");
         return succeed;
     }
 
@@ -192,15 +208,16 @@ public class NetworkService {
         normalizer.transform(predictData);
         INDArray predictionLabels = this.model.output(predictData.getFeatureMatrix());
         for (int i = 0; i < predictionLabels.rows(); i++) {
-            String predictHeaderName="";
+            String predictHeaderName = "";
             if (labelIndex > 0) {
                 csvData.get(i).put(headerNames.get(labelIndex),
                         INDArrayUtil.getMaxIndexFloatArrayFromSlice(predictData.getLabels().slice(i)));
-                csvData.get(i).put(headerNames.get(labelIndex)+"(预测值)", INDArrayUtil.getMaxIndexFloatArrayFromSlice(predictionLabels.slice(i)));                
-            }else{
+                csvData.get(i).put(headerNames.get(labelIndex) + "(预测值)",
+                        INDArrayUtil.getMaxIndexFloatArrayFromSlice(predictionLabels.slice(i)));
+            } else {
                 csvData.get(i).put("预测值", INDArrayUtil.getMaxIndexFloatArrayFromSlice(predictionLabels.slice(i)));
             }
-            
+
             log.info(csvData.get(i).toString());
         }
     }
@@ -212,12 +229,12 @@ public class NetworkService {
         for (int i = 0; i < features.rows(); i++) {
             INDArray slice = features.slice(i);
             Map<String, Object> animal = new LinkedHashMap();
-            int index=0;
-            for(String headerName : headerNames) {    
+            int index = 0;
+            for (String headerName : headerNames) {
                 if (index < slice.length()) {
                     animal.put(headerName, slice.getInt(index++));
-                }else{
-                    animal.put(headerName, null); 
+                } else {
+                    animal.put(headerName, null);
                 }
             }
             animals.put(i, animal);
@@ -239,6 +256,7 @@ public class NetworkService {
         private int nestedOutputNum;
         private MultiLayerNetwork nestedModel;
         private IterationListener nestedIterationListener;
+        private StatsListener nestedStatsListener;
         private Normalizer nestedNormalizer = new NormalizerStandardize();
 
         public NetworkServiceBuilder(final int numInputs, final int outputNum) {
@@ -271,15 +289,21 @@ public class NetworkService {
             return this;
         }
 
-        public NetworkService build() {
+        public NetworkServiceBuilder iterationListener(StatsListener statsListener) throws IOException {
+            this.nestedStatsListener = statsListener;
+            return this;
+        }
+
+        public FeedforwardNeuralNetworks build() {
             if (nestedIterationListener == null) {
                 this.nestedIterationListener = new ScoreIterationListener(100);
             }
             if (this.nestedModel != null) {
-                return new NetworkService(this.nestedModel, this.nestedNormalizer, this.nestedIterationListener);
+                return new FeedforwardNeuralNetworks(this.nestedModel, this.nestedNormalizer,
+                        this.nestedIterationListener,this.nestedStatsListener);
             } else {
-                return new NetworkService(this.nestedNormalizer, this.nestedIterationListener, this.nestedSeed,
-                        this.nestedIterations, this.nestedNumInputs, this.nestedOutputNum);
+                return new FeedforwardNeuralNetworks(this.nestedNormalizer, this.nestedIterationListener,this.nestedStatsListener,
+                        this.nestedSeed, this.nestedIterations, this.nestedNumInputs, this.nestedOutputNum);
             }
         }
     }
