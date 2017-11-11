@@ -47,7 +47,6 @@ public class NetworkService {
     private MultiLayerNetwork model;
     private DataSet trainData;
     private DataSet testData;
-    private DataSet predictionData;
     private Normalizer normalizer;
 
     public NetworkService(MultiLayerNetwork model, Normalizer normalizer, IterationListener iterationListener) {
@@ -95,18 +94,14 @@ public class NetworkService {
             SplitTestAndTrain splitTrain = allData.splitTestAndTrain(percentTrain);
             trainData = splitTrain.getTrain();
             testData = splitTrain.getTest();
-            SplitTestAndTrain splitTest = testData.splitTestAndTrain(0.5);
-            testData = splitTest.getTrain();
-            predictionData = splitTest.getTest();
-            this.training(trainData, testData, predictionData, numClasses, numEpochs, hopeScore, timeoutMinute);
-            return Boolean.TRUE;
+            return this.training(trainData, testData, numClasses, numEpochs, hopeScore, timeoutMinute);
         } else {
             log.error(String.format("文件 %s 不存在", file.getAbsolutePath()));
             return Boolean.FALSE;
         }
     }
 
-    private boolean training(DataSet trainingData, DataSet testData, DataSet predictionData, int numClasses, int numEpochs,
+    private boolean training(DataSet trainingData, DataSet testData, int numClasses, int numEpochs,
             double hopeScore, long timeoutMinute) {
         //获取 STDEV 基于样本估算标准偏差
         normalizer.fit(trainingData);
@@ -114,8 +109,6 @@ public class NetworkService {
         normalizer.transform(trainingData);
         //标准化测试数据，应该是要转为0-1之间的数据
         normalizer.transform(testData);
-        //标准化校验数据，应该是要转为0-1之间的数据
-        normalizer.transform(predictionData);
 
         //超时时间
         long stopTime = System.currentTimeMillis()+(timeoutMinute*60*1000);
@@ -123,36 +116,42 @@ public class NetworkService {
         log.info("开始训练模型");
         INDArray output = null;
         long s = System.currentTimeMillis();
+        boolean succeed = Boolean.FALSE;
+        Evaluation eval = new Evaluation(numClasses);
         while(System.currentTimeMillis()<stopTime || numEpochsCounter<numEpochs){
-        //for (int i = 0; i < numEpochs; i++) {
-            model.fit(trainingData);
-            Evaluation eval = new Evaluation(numClasses);
-            output = model.output(predictionData.getFeatureMatrix());
-            eval.eval(predictionData.getLabels(), output);
+            model.fit(trainingData);            
+            output = model.output(testData.getFeatureMatrix());
+            new Evaluation(numClasses);
+            eval.eval(testData.getLabels(), output);
             if (eval.f1() >= hopeScore) {
-                long e = System.currentTimeMillis();
-                log.info("+-----------------------------------------------------+");
-                log.info("|               训练完成(期望评价分:" + hopeScore + ")");
-                log.info("+-----------------------------------------------------+");
-                /*
-                 * 精确率、召回率和F1值衡量的是模型的相关性。举例来说，“癌症不会复发”这样的预测结果（即假负例/假阴性）就有风险，
-                 * 因为病人会不再寻求进一步治疗。所以，比较明智的做法是选择一种可以避免假负例的模型（即精确率、召回率和F1值较高），
-                 * 尽管总体上的准确率可能会相对较低一些。
-                 * */
-                log.info("| 准确率:" + eval.accuracy());//模型准确识别出的MNIST图像数量占总数的百分比
-                log.info("| 精确率:" + eval.precision());//真正例的数量除以真正例与假正例数之和
-                log.info("| 召回率:" + eval.recall());//真正例的数量除以真正例与假负例数之和
-                log.info("| 评价分:" + eval.f1());//精确率和召回率的加权平均值
-                log.info("+-----------------------------------------------------+");
-                log.info("+ 耗时:"+(e-s)/1000+"秒");
-                log.info("+-----------------------------------------------------+");
-                return Boolean.TRUE;
+                succeed = Boolean.TRUE;
+                break;
             } else {
                 log.info("评价分:" + eval.f1() + ",期望分:" + hopeScore);
-            }
+            }         
             numEpochsCounter++;
         }
-        return Boolean.FALSE;
+        long e = System.currentTimeMillis();
+        log.info("+-----------------------------------------------------+");
+        if(succeed){
+            log.info("| 训练成功(期望评价分:" + hopeScore + ")");
+        }else{
+            log.info("| 训练失败(期望评价分:" + hopeScore + ")");
+        }
+        log.info("+-----------------------------------------------------+");
+        /*
+         * 精确率、召回率和F1值衡量的是模型的相关性。举例来说，“癌症不会复发”这样的预测结果（即假负例/假阴性）就有风险，
+         * 因为病人会不再寻求进一步治疗。所以，比较明智的做法是选择一种可以避免假负例的模型（即精确率、召回率和F1值较高），
+         * 尽管总体上的准确率可能会相对较低一些。
+         * */
+        log.info("| 准确率:" + eval.accuracy());//模型准确识别出的MNIST图像数量占总数的百分比
+        log.info("| 精确率:" + eval.precision());//真正例的数量除以真正例与假正例数之和
+        log.info("| 召回率:" + eval.recall());//真正例的数量除以真正例与假负例数之和
+        log.info("| 评价分:" + eval.f1());//精确率和召回率的加权平均值
+        log.info("+-----------------------------------------------------+");
+        log.info("+ 耗时:"+(e-s)/1000+"秒");
+        log.info("+-----------------------------------------------------+");           
+        return succeed;
     }
 
     public void predict(File file, int skipNumLines, String delimiter, int batchSize)
