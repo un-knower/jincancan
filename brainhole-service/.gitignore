@@ -8,3 +8,5 @@ bomc.jks
 license.dat
 .DS_Store
 .springBeans
+/data/
+/tmp/
