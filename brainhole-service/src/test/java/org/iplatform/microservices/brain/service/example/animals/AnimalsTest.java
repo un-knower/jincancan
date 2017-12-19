@@ -58,7 +58,7 @@ public class AnimalsTest {
         int numEpochs = 10;//循环次数，循环次数>cvs文件总行数/递归批次数
         double hopeScore = 0.97d;//期望评分数，当训练后的分数大于等于期望评分数后停止训练
         
-        FeedforwardNeuralNetworks feedforwardNeuralNetworks = new FeedforwardNeuralNetworks.NetworkServiceBuilder(numInputs, outputNum).seed(6).iterations(1000).build();
+        FeedforwardNeuralNetworks feedforwardNeuralNetworks = new FeedforwardNeuralNetworks.FeedforwardNeuralNetworksBuilder(numInputs, outputNum).seed(6).iterations(1000).build();
         //训练模型
         boolean trainingSucceed = feedforwardNeuralNetworks.trainingCSV(new File("data/animals/animals_code.csv"), skipNumLines,
                 delimiter, percentTrain, batchSize, labelIndex, outputNum, numEpochs, hopeScore);

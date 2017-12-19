@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.iplatform.microservices.brain.service.multiLayernetwork.FeedforwardNeuralNetworks;
-import org.iplatform.microservices.brain.service.multiLayernetwork.Monitor;
+import org.iplatform.microservices.brain.service.multiLayernetwork.listeners.NeuralNetworksMonitorListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class APIService {
     private CacheManager cacheManager;
 
     @Autowired
-    Monitor monitor;
+    NeuralNetworksMonitorListener neuralNetworksMonitorListener;
 
     @RequestMapping(value = "/hi", method = RequestMethod.GET)
     @ResponseBody
@@ -52,8 +52,8 @@ public class APIService {
         int numEpochs = 10;//循环次数，循环次数>cvs文件总行数/递归批次数
         double hopeScore = 0.97d;//期望评分数，当训练后的分数大于等于期望评分数后停止训练
 
-        FeedforwardNeuralNetworks feedforwardNeuralNetworks = new FeedforwardNeuralNetworks.NetworkServiceBuilder(
-                numInputs, outputNum).seed(6).iterations(1000).iterationListener(monitor.getStatsListener()).build();
+        FeedforwardNeuralNetworks feedforwardNeuralNetworks = new FeedforwardNeuralNetworks.FeedforwardNeuralNetworksBuilder(
+                numInputs, outputNum).seed(6).iterations(1000).iterationListener(neuralNetworksMonitorListener.getStatsListener()).build();
         //训练模型
         boolean trainingSucceed = feedforwardNeuralNetworks.trainingCSV(new File("data/animals/animals_code.csv"),
                 skipNumLines, delimiter, percentTrain, batchSize, labelIndex, outputNum, numEpochs, hopeScore);

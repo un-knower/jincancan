@@ -11,13 +11,13 @@
 		<brainhole.version>0.0.1</brainhole.version>
 		<java.version>1.8</java.version>
 		<nd4j.backend>nd4j-native</nd4j.backend>
-		<nd4j.version>0.8.0</nd4j.version>
-		<dl4j.version>0.8.0</dl4j.version>
-		<datavec.version>0.8.0</datavec.version>
-		<arbiter.version>0.8.0</arbiter.version>
-		<rl4j.version>0.8.0</rl4j.version>
-		<dl4j.spark.version>0.8.0_spark_1</dl4j.spark.version>
-		<datavec.spark.version>0.8.0_spark_1</datavec.spark.version>
+		<nd4j.version>0.9.1</nd4j.version>
+		<dl4j.version>0.9.1</dl4j.version>
+		<datavec.version>0.9.1</datavec.version>
+		<arbiter.version>0.9.1</arbiter.version>
+		<rl4j.version>0.9.1</rl4j.version>
+		<dl4j.spark.version>0.9.1_spark_1</dl4j.spark.version>
+		<datavec.spark.version>0.9.1_spark_1</datavec.spark.version>
 		<scala.binary.version>2.11</scala.binary.version>
 	</properties>
 

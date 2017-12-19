@@ -1,5 +1,5 @@
 /*
- * 前馈神经网络
+ * 前馈神经网络，卷积神经网络
  * 可用于分类预测
  * */
 package org.iplatform.microservices.brain.service.multiLayernetwork;
@@ -48,24 +48,16 @@ import org.springframework.stereotype.Service;
  * @author zhanglei
  * 
  */
-public class FeedforwardNeuralNetworks {
+public class FeedforwardNeuralNetworks extends NeuralNetworks {
 
     private static Logger log = LoggerFactory.getLogger(FeedforwardNeuralNetworks.class);
-    private MultiLayerNetwork model;
-    private DataSet trainData;
-    private DataSet testData;
-    private Normalizer normalizer;
 
-    public FeedforwardNeuralNetworks(MultiLayerNetwork model, Normalizer normalizer,
-            IterationListener iterationListener, StatsListener statsListener) {
-        this.model = model;
-        this.model.setListeners(iterationListener);
-        if (statsListener != null) {
-            this.model.setListeners(statsListener);
-        }
-        this.normalizer = normalizer;
+    
+    public FeedforwardNeuralNetworks(MultiLayerNetwork model, Normalizer normalizer, IterationListener iterationListener,
+            StatsListener statsListener) {
+        super(model,normalizer,iterationListener,statsListener);
     }
-
+    
     /**
      * @param seed 随机因子
      * @param iterations 迭代次数
@@ -242,14 +234,7 @@ public class FeedforwardNeuralNetworks {
         return animals;
     }
 
-    public File saveModel(String modelFile, boolean saveUpdater) throws IOException {
-        File locationToSave = new File(modelFile);
-        ModelSerializer.writeModel(this.model, locationToSave, saveUpdater);
-        log.info(String.format("模型存储 %s", locationToSave.getAbsolutePath()));
-        return locationToSave;
-    }
-
-    public static class NetworkServiceBuilder {
+    public static class FeedforwardNeuralNetworksBuilder {
         private long nestedSeed = 6;
         private int nestedIterations = 1000;
         private int nestedNumInputs;
@@ -259,37 +244,37 @@ public class FeedforwardNeuralNetworks {
         private StatsListener nestedStatsListener;
         private Normalizer nestedNormalizer = new NormalizerStandardize();
 
-        public NetworkServiceBuilder(final int numInputs, final int outputNum) {
+        public FeedforwardNeuralNetworksBuilder(final int numInputs, final int outputNum) {
             this.nestedNumInputs = numInputs;
             this.nestedOutputNum = outputNum;
         }
 
-        public NetworkServiceBuilder seed(long seed) {
+        public FeedforwardNeuralNetworksBuilder seed(long seed) {
             this.nestedSeed = seed;
             return this;
         }
 
-        public NetworkServiceBuilder iterations(int iterations) {
+        public FeedforwardNeuralNetworksBuilder iterations(int iterations) {
             this.nestedIterations = iterations;
             return this;
         }
 
-        public NetworkServiceBuilder normalizer(Normalizer normalizer) {
+        public FeedforwardNeuralNetworksBuilder normalizer(Normalizer normalizer) {
             this.nestedNormalizer = normalizer;
             return this;
         }
 
-        public NetworkServiceBuilder loadModel(File modelFile) throws IOException {
+        public FeedforwardNeuralNetworksBuilder loadModel(File modelFile) throws IOException {
             this.nestedModel = ModelSerializer.restoreMultiLayerNetwork(modelFile);
             return this;
         }
 
-        public NetworkServiceBuilder iterationListener(IterationListener iterationListener) throws IOException {
+        public FeedforwardNeuralNetworksBuilder iterationListener(IterationListener iterationListener) throws IOException {
             this.nestedIterationListener = iterationListener;
             return this;
         }
 
-        public NetworkServiceBuilder iterationListener(StatsListener statsListener) throws IOException {
+        public FeedforwardNeuralNetworksBuilder iterationListener(StatsListener statsListener) throws IOException {
             this.nestedStatsListener = statsListener;
             return this;
         }

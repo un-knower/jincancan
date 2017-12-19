@@ -36,7 +36,7 @@ public class WineQualityTest {
         double hopeScore = 0.97d;//期望评分数，当训练后的分数大于等于期望评分数后停止训练
         
         //训练模型
-        FeedforwardNeuralNetworks feedforwardNeuralNetworks = new FeedforwardNeuralNetworks.NetworkServiceBuilder(numInputs, outputNum).seed(6).iterations(1000).build();
+        FeedforwardNeuralNetworks feedforwardNeuralNetworks = new FeedforwardNeuralNetworks.FeedforwardNeuralNetworksBuilder(numInputs, outputNum).seed(6).iterations(1000).build();
         boolean trainingSucceed = feedforwardNeuralNetworks.trainingCSV(new File("data/winequality/winequality-red.csv"), skipNumLines,
                 delimiter, percentTrain, batchSize, labelIndex, outputNum, numEpochs, hopeScore);
 
