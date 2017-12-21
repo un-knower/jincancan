@@ -1,4 +1,4 @@
-package org.iplatform.microservices.brain.service.example.animals;
+package org.iplatform.microservices.brain.service.example.fnn;
 
 import java.io.File;
 

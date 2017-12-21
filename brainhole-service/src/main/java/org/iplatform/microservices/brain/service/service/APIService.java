@@ -54,24 +54,24 @@ public class APIService {
         FeedforwardNeuralNetworks feedforwardNeuralNetworks = new FeedforwardNeuralNetworks.FeedforwardNeuralNetworksBuilder(
                 numInputs, outputNum).seed(6).iterations(1000).iterationListener(neuralNetworksMonitorListener.getStatsListener()).build();
         //训练模型
-        boolean trainingSucceed = feedforwardNeuralNetworks.trainingCSV(new File("data/animals/animals_code.csv"),
+        boolean trainingSucceed = feedforwardNeuralNetworks.trainingCSV(new File("data/fnn/animals_code.csv"),
                 skipNumLines, delimiter, percentTrain, batchSize, labelIndex, outputNum, numEpochs, hopeScore,false);
 
         //保存模型
         if (trainingSucceed) {
             String tempDir = System.getProperty("java.io.tmpdir");
-            String modelDirectory = FilenameUtils.concat(tempDir, "brainhole/animals/");
+            String modelDirectory = FilenameUtils.concat(tempDir, "brainhole/fnn/");
             feedforwardNeuralNetworks.saveModel(modelDirectory,"model.brain", Boolean.TRUE);
 
             //使用模型进行分类预测
             int predictFileRowCount = 3;//预测数据3行
 
             //情况2，验证数据不包含实际值
-            feedforwardNeuralNetworks.predict(new File("data/animals/animals_prediction.csv"), skipNumLines, delimiter,
+            feedforwardNeuralNetworks.predict(new File("data/fnn/animals_prediction.csv"), skipNumLines, delimiter,
                     predictFileRowCount);
 
             //情况1，验证数据包含实际值，可用于比较实际值和预测值
-            feedforwardNeuralNetworks.predict(new File("data/animals/animals_prediction_compare.csv"), skipNumLines,
+            feedforwardNeuralNetworks.predict(new File("data/fnn/animals_prediction_compare.csv"), skipNumLines,
                     delimiter, predictFileRowCount, labelIndex, outputNum);
         } else {
             logger.info("模型训练结束，未达到期望评价分:" + hopeScore);
