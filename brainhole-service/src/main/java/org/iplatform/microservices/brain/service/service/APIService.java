@@ -3,6 +3,7 @@ package org.iplatform.microservices.brain.service.service;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.iplatform.microservices.brain.service.multiLayernetwork.FeedforwardNeuralNetworks;
 import org.iplatform.microservices.brain.service.multiLayernetwork.listeners.NeuralNetworksMonitorListener;
 import org.slf4j.Logger;
@@ -27,8 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class APIService {
     private static final Logger logger = LoggerFactory.getLogger(APIService.class);
 
-    @Autowired
-    private CacheManager cacheManager;
 
     @Autowired
     NeuralNetworksMonitorListener neuralNetworksMonitorListener;
@@ -56,11 +55,13 @@ public class APIService {
                 numInputs, outputNum).seed(6).iterations(1000).iterationListener(neuralNetworksMonitorListener.getStatsListener()).build();
         //训练模型
         boolean trainingSucceed = feedforwardNeuralNetworks.trainingCSV(new File("data/animals/animals_code.csv"),
-                skipNumLines, delimiter, percentTrain, batchSize, labelIndex, outputNum, numEpochs, hopeScore);
+                skipNumLines, delimiter, percentTrain, batchSize, labelIndex, outputNum, numEpochs, hopeScore,false);
 
         //保存模型
         if (trainingSucceed) {
-            feedforwardNeuralNetworks.saveModel("model.brain", Boolean.TRUE);
+            String tempDir = System.getProperty("java.io.tmpdir");
+            String modelDirectory = FilenameUtils.concat(tempDir, "brainhole/animals/");
+            feedforwardNeuralNetworks.saveModel(modelDirectory,"model.brain", Boolean.TRUE);
 
             //使用模型进行分类预测
             int predictFileRowCount = 3;//预测数据3行

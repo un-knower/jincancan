@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.iplatform</groupId>
 	<artifactId>brainhole-ui</artifactId>
-	<version>${brainhole.version}</version>
+	<version>0.0.1</version>
     <name>Brain hole 客户端</name>
     <description></description>	
 	<packaging>jar</packaging>
@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.iplatform</groupId>
 		<artifactId>brainhole-parent</artifactId>
-		<version>${brainhole.version}</version>
+		<version>0.0.1</version>
 		<relativePath>../</relativePath>
 	</parent>
 

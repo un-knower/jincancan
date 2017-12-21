@@ -4,11 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.iplatform</groupId>
 	<artifactId>brainhole-parent</artifactId>
-	<version>${brainhole.version}</version>
+	<version>0.0.1</version>
 	<packaging>pom</packaging>
 
 	<properties>
-		<brainhole.version>0.0.1</brainhole.version>
 		<java.version>1.8</java.version>
 		<nd4j.backend>nd4j-native</nd4j.backend>
 		<nd4j.version>0.9.1</nd4j.version>

@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.iplatform</groupId>
 	<artifactId>brainhole-util</artifactId>
-	<version>${brainhole.version}</version>
+	<version>0.0.1</version>
 
 	<parent>
 		<groupId>org.iplatform</groupId>
 		<artifactId>brainhole-parent</artifactId>
-		<version>${brainhole.version}</version>
+		<version>0.0.1</version>
 		<relativePath>../</relativePath>
 	</parent>
     <dependencies>

@@ -33,8 +33,10 @@ public abstract class NeuralNetworks {
         this.normalizer = normalizer;
     }
 
-    public File saveModel(String modelFile, boolean saveUpdater) throws IOException {
-        File locationToSave = new File(modelFile);
+    public File saveModel(String modelDirectory, String modelFile, boolean saveUpdater) throws IOException {
+        File dirFile = new File(modelDirectory);
+        dirFile.mkdir();
+        File locationToSave = new File(dirFile.getAbsolutePath()+modelFile);
         ModelSerializer.writeModel(this.model, locationToSave, saveUpdater);
         log.info(String.format("模型存储 %s", locationToSave.getAbsolutePath()));
         return locationToSave;

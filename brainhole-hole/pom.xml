@@ -5,15 +5,14 @@
 
 	<groupId>org.iplatform</groupId>
 	<artifactId>brainhole-hole</artifactId>
-	<version>${brainhole.version}</version>
-	<name>Hole</name>
+	<version>0.0.1</version>
 	<description>Hole</description>
 	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>org.iplatform</groupId>
 		<artifactId>brainhole-parent</artifactId>
-		<version>${brainhole.version}</version>
+		<version>0.0.1</version>
 		<relativePath>../</relativePath>
 	</parent>
 
@@ -35,7 +34,7 @@
 		<dependency>
 			<groupId>org.iplatform</groupId>
 			<artifactId>brainhole-util</artifactId>
-			<version>${brainhole.version}</version>
+			<version>0.0.1</version>
 		</dependency>
 	</dependencies>
 
