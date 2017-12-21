@@ -35,8 +35,8 @@ public abstract class NeuralNetworks {
 
     public File saveModel(String modelDirectory, String modelFile, boolean saveUpdater) throws IOException {
         File dirFile = new File(modelDirectory);
-        dirFile.mkdir();
-        File locationToSave = new File(dirFile.getAbsolutePath()+modelFile);
+        dirFile.mkdirs();
+        File locationToSave = new File(dirFile.getAbsolutePath()+File.separator+modelFile);
         ModelSerializer.writeModel(this.model, locationToSave, saveUpdater);
         log.info(String.format("模型存储 %s", locationToSave.getAbsolutePath()));
         return locationToSave;
