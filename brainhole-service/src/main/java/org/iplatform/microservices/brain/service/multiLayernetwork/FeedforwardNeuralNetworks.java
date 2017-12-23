@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.FilenameUtils;
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
@@ -34,7 +32,7 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.util.ModelSerializer;
-import org.iplatform.microservices.brain.service.multiLayernetwork.listeners.ScoreIterationListener;
+import org.iplatform.microservices.brain.service.multiLayernetwork.listeners.LossScoreIterationListener;
 import org.iplatform.microservices.brain.util.INDArrayUtil;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -47,8 +45,6 @@ import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * @author zhanglei
@@ -165,7 +161,6 @@ public class FeedforwardNeuralNetworks extends NeuralNetworks {
         esConf.setIterationTerminationConditions(iterationTerminationConditions);
 
         EarlyStoppingTrainer trainer = new EarlyStoppingTrainer(esConf,multiLayerConfiguration,new TestDataSetIterator(trainingData));
-
         EarlyStoppingResult<MultiLayerNetwork> result = trainer.fit();
         Map<Integer,Double> scoreVsEpoch = result.getScoreVsEpoch();
         List<Integer> list = new ArrayList<>(scoreVsEpoch.keySet());
@@ -202,7 +197,7 @@ public class FeedforwardNeuralNetworks extends NeuralNetworks {
         long stopTime = System.currentTimeMillis() + (timeoutMinute * 60 * 1000);
         long numEpochsCounter = 0;
         log.info("开始训练模型");
-        INDArray output = null;
+        INDArray output;
         long s = System.currentTimeMillis();
         boolean succeed = Boolean.FALSE;
         Evaluation eval = new Evaluation(numClasses);
@@ -217,7 +212,7 @@ public class FeedforwardNeuralNetworks extends NeuralNetworks {
 //            } else {
 //                log.info("评价分:" + eval.f1() + ",期望分:" + hopeScore);
 //            }
-            log.info("评价分:" + eval.f1());
+            log.info("epoch: "+numEpochsCounter+" \t评价分:" + eval.f1());
             numEpochsCounter++;
         }
         long e = System.currentTimeMillis();
@@ -373,7 +368,7 @@ public class FeedforwardNeuralNetworks extends NeuralNetworks {
 
         public FeedforwardNeuralNetworks build() {
             if (nestedIterationListener == null) {
-                this.nestedIterationListener = new ScoreIterationListener(100);
+                this.nestedIterationListener = new LossScoreIterationListener(100);
             }
             if (this.nestedModel != null) {
                 return new FeedforwardNeuralNetworks(this.nestedModel, this.nestedNormalizer,

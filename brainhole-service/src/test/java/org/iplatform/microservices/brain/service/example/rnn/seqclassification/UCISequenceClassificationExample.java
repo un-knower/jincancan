@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.datavec.api.records.reader.SequenceRecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVSequenceRecordReader;
 import org.datavec.api.split.NumberedFileInputSplit;
@@ -23,6 +24,7 @@ import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.junit.Test;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
@@ -65,15 +67,17 @@ import au.com.bytecode.opencsv.CSVReader;
 public class UCISequenceClassificationExample {
     private static final Logger log = LoggerFactory.getLogger(UCISequenceClassificationExample.class);
     //训练数据临时存储路径
-    private static File baseDir = new File("tmp/seqclassification/");
-    private static File baseTrainDir = new File(baseDir, "train");
-    private static File featuresDirTrain = new File(baseTrainDir, "features");
-    private static File labelsDirTrain = new File(baseTrainDir, "labels");
-    private static File baseTestDir = new File(baseDir, "test");
-    private static File featuresDirTest = new File(baseTestDir, "features");
-    private static File labelsDirTest = new File(baseTestDir, "labels");
 
-    public static void main(String[] args) throws Exception {
+    private static File baseDir;
+    private static File baseTrainDir;
+    private static File featuresDirTrain;
+    private static File labelsDirTrain;
+    private static File baseTestDir;
+    private static File featuresDirTest;
+    private static File labelsDirTest;
+
+    @Test
+    public void test() throws Exception {
         downloadUCIData();
 
         // ----- Load the training data -----
@@ -150,18 +154,20 @@ public class UCISequenceClassificationExample {
 
     //下载数据集合
     private static void downloadUCIData() throws Exception {
+        String tempDir = System.getProperty("java.io.tmpdir");
+        String tmpDirectory = FilenameUtils.concat(tempDir, "brainhole/seqclassification/");
+        baseDir = new File(tmpDirectory);
+        baseTrainDir = new File(baseDir, "train");
+        featuresDirTrain = new File(baseTrainDir, "features");
+        labelsDirTrain = new File(baseTrainDir, "labels");
+        baseTestDir = new File(baseDir, "test");
+        featuresDirTest = new File(baseTestDir, "features");
+        labelsDirTest = new File(baseTestDir, "labels");
+
+        //初始化数据目录
         if (baseDir.exists()) {
             baseDir.deleteOnExit();    
-        };        
-        String file = "data/seqclassification/data.csv";
-        FileReader fReader = new FileReader(file);  
-        CSVReader csvReader = new CSVReader(fReader); 
-        List<String[]> rows = csvReader.readAll();
-//        String data = IOUtils.toString(new FileInputStream(file));
-//        String[] lines = data.split("\n");
-        
-        //初始化数据目录
-        
+        }
         baseDir.mkdir();
         baseTrainDir.mkdir();
         featuresDirTrain.mkdir();
@@ -170,6 +176,10 @@ public class UCISequenceClassificationExample {
         featuresDirTest.mkdir();
         labelsDirTest.mkdir();
 
+        String file = "data/seqclassification/data.csv";
+        FileReader fReader = new FileReader(file);
+        CSVReader csvReader = new CSVReader(fReader); 
+        List<String[]> rows = csvReader.readAll();
         
         List<Pair<String, Integer>> contentAndLabels = new ArrayList<>();
         for (String[] row : rows) {

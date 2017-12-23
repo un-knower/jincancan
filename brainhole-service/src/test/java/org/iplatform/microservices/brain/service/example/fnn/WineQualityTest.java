@@ -3,6 +3,7 @@ package org.iplatform.microservices.brain.service.example.fnn;
 import java.io.File;
 
 import org.iplatform.microservices.brain.service.multiLayernetwork.FeedforwardNeuralNetworks;
+import org.iplatform.microservices.brain.service.service.NeuralNetworksMonitorService;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,19 +25,26 @@ public class WineQualityTest {
     private static Logger log = LoggerFactory.getLogger(WineQualityTest.class);
 
     @Test
-    public void testWineQuality() throws Exception, InterruptedException {
+    public void testWineQuality() throws Exception {
+        NeuralNetworksMonitorService monitor = new NeuralNetworksMonitorService();
+        monitor.init();
+
         int skipNumLines = 1;//cvs文件列头占用的行数
         String delimiter = ";";//cvs文件分隔符
         double percentTrain = 0.65;//文件拆分比例，训练集0.65,测试集0.35
-        int batchSize = 1600;//每批次训练个数        
-        int numEpochs = 50;//运行训练集的次数
+        int batchSize = 100;//每批次训练个数
+        int numEpochs = 500;//运行训练集的次数
         int labelIndex = 11;//结果列在cvs的位置
         int numInputs=11;//特征向量个数
         int outputNum = 10;//结果分类数        
         double hopeScore = 0.97d;//期望评分数，当训练后的分数大于等于期望评分数后停止训练
         
         //训练模型
-        FeedforwardNeuralNetworks feedforwardNeuralNetworks = new FeedforwardNeuralNetworks.FeedforwardNeuralNetworksBuilder(numInputs, outputNum).seed(6).iterations(100).build();
+        FeedforwardNeuralNetworks feedforwardNeuralNetworks = new FeedforwardNeuralNetworks.FeedforwardNeuralNetworksBuilder(numInputs, outputNum)
+                .seed(100)
+                .iterations(100)
+                .iterationListener(monitor.getStatsListener())
+                .build();
         boolean trainingSucceed = feedforwardNeuralNetworks.trainingCSV(new File("data/winequality/winequality-red.csv"), skipNumLines,
                 delimiter, percentTrain, batchSize, labelIndex, outputNum, numEpochs, hopeScore,false);
 
@@ -46,6 +54,8 @@ public class WineQualityTest {
         } else {
             log.info("模型训练失败");
         }
+
+        monitor.waitTermination(1000*3600);
     }
 
     @Test

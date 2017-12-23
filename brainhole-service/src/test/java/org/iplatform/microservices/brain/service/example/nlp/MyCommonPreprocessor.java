@@ -10,6 +10,11 @@ public class MyCommonPreprocessor implements TokenPreProcess {
     
     @Override
     public String preProcess(String token) {
-        return punctPattern.matcher(token).replaceAll("");
+        if(token.length()>=2){
+            return punctPattern.matcher(token).replaceAll("");
+        }else{
+            return "";
+        }
+
     }
 }
