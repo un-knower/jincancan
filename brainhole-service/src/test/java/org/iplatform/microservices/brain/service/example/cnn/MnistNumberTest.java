@@ -45,6 +45,8 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 /*
+* 给定用户一个文件测试的手写数字图像
+* 0-9数字 白色或者黑色背景进行识别
 * https://raw.githubusercontent.com/myleott/mnist_png/master/mnist_png.tar.gz
 * */
 public class MnistNumberTest {
@@ -218,15 +220,19 @@ public class MnistNumberTest {
         for(String filepath : files){
             //要预测的文件
             File file = new File(filepath);
-            // Use NativeImageLoader to convert to numerical matrix
+            // 使用NativeImageLoader转换为数值矩阵
             NativeImageLoader loader = new NativeImageLoader(height, width, channels);
+            // 得到图像并赋值INDArray
             INDArray image = loader.asMatrix(file);
             DataNormalization scaler = new ImagePreProcessingScaler(0,1);
             scaler.transform(image);
-
+            // 传递到神经网络 并得到概率值
             INDArray output = model.output(image);
+            // 获取置信度评分最大的索引号
             int maxScoreIndex = INDArrayUtil.getMaxIndexFloatArrayFromSlice(output);
+            // 根据索引获取置信度
             double confidence = output.getDouble(maxScoreIndex);
+            // 根据索引获取预测值
             int predictValue = labelList.get(maxScoreIndex);
             String shortfilepath = filepath.replace(DATA_PATH,"");
             shortfilepath = shortfilepath.replace("mnist_png/training/","");
